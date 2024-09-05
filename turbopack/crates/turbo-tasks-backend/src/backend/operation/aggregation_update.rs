@@ -142,6 +142,7 @@ impl AggregatedDataUpdate {
         let Self {
             dirty_container_update,
         } = self;
+        println!("apply {:?} {dirty_tasks_update:?}", task.id());
         let mut result = Self::default();
         if let Some((dirty_container_id, count)) = dirty_container_update {
             let mut added = false;
@@ -253,6 +254,7 @@ impl AggregationUpdateQueue {
 
     pub fn process(&mut self, ctx: &ExecuteContext<'_>) -> bool {
         if let Some(job) = self.jobs.pop_front() {
+            println!("process {:?}", job);
             match job {
                 AggregationUpdateJob::UpdateAggregationNumber {
                     task_id,
@@ -279,7 +281,6 @@ impl AggregationUpdateQueue {
                             });
                         }
                     } else {
-                        task.insert(CachedDataItem::AggregationNumber {
                             value: AggregationNumber {
                                 base: base_aggregation_number,
                                 distance,
@@ -577,6 +578,11 @@ impl AggregationUpdateQueue {
                         ctx.task_pair(upper_id, task_id, TaskDataCategory::Meta);
                     let upper_aggregation_number = get_aggregation_number(&upper);
                     let task_aggregation_number = get_aggregation_number(&task);
+                    println!(
+                        "BalanceEdge {:?} {upper_aggregation_number} {:?} \
+                         {task_aggregation_number}",
+                        upper_id, task_id
+                    );
 
                     let should_be_inner = is_root_node(upper_aggregation_number)
                         || upper_aggregation_number > task_aggregation_number;
@@ -675,7 +681,12 @@ impl AggregationUpdateQueue {
             }
         }
 
-        self.jobs.is_empty()
+        if self.jobs.is_empty() {
+            println!("done");
+            true
+        } else {
+            false
+        }
     }
 }
 
