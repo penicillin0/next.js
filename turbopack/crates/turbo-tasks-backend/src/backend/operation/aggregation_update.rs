@@ -294,6 +294,7 @@ impl AggregationUpdateQueue {
                             });
                         }
                     } else {
+                        task.insert(CachedDataItem::AggregationNumber {
                             value: AggregationNumber {
                                 base: base_aggregation_number,
                                 distance,
