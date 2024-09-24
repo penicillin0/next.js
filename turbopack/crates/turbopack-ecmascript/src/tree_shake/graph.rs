@@ -609,7 +609,7 @@ impl DepGraph {
     /// performance.
     pub(super) fn finalize(
         &self,
-        _data: &FxHashMap<ItemId, ItemData>,
+        data: &FxHashMap<ItemId, ItemData>,
     ) -> InternedGraph<Vec<ItemId>> {
         let graph = self.g.idx_graph.clone().into_graph::<u32>();
 
@@ -618,8 +618,17 @@ impl DepGraph {
         let mut new_graph = InternedGraph::default();
         let mut done = FxHashSet::default();
 
-        let mapped = condensed.map(
+        let mapped = condensed.filter_map(
             |_, node| {
+                if node.iter().all(|&ix| {
+                    let id = &self.g.graph_ix[ix as usize];
+
+                    data[id].skip_content()
+                }) {
+                    done.extend(node.iter().copied());
+                    return None;
+                }
+
                 let mut item_ids = node
                     .iter()
                     .map(|&ix| {
@@ -630,9 +639,9 @@ impl DepGraph {
                     .collect::<Vec<_>>();
                 item_ids.sort();
 
-                new_graph.node(&item_ids)
+                Some(new_graph.node(&item_ids))
             },
-            |_, edge| *edge,
+            |_, edge| Some(*edge),
         );
 
         let map = GraphMap::from_graph(mapped);
