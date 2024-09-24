@@ -142,7 +142,6 @@ impl AggregatedDataUpdate {
         let Self {
             dirty_container_update,
         } = self;
-        println!("apply {:?} {dirty_container_update:?}", task.id());
         let mut result = Self::default();
         if let Some((dirty_container_id, count)) = dirty_container_update {
             let mut added = false;
@@ -188,19 +187,11 @@ impl AggregatedDataUpdate {
                 }
                 (new != 0).then_some(new)
             });
-            println!(
-                "apply {task_id:?} {dirty_container_update:?} added={added:?} removed={removed:?} \
-                 count_update={count_update} => {:?}",
-                result.dirty_container_update
-            );
             if let Some((_, count)) = result.dirty_container_update.as_ref() {
                 if let Some(root_state) = get!(task, AggregateRoot) {
                     if *count < 0 {
                         root_state.all_clean_event.notify(usize::MAX);
                         if matches!(root_state.ty, ActiveType::CachedActiveUntilClean) {
-                            println!(
-                                "apply {task_id:?} {dirty_container_update:?} removed RootState"
-                            );
                             task.remove(&CachedDataItemKey::AggregateRoot {});
                         }
                     }
@@ -260,7 +251,6 @@ impl AggregationUpdateQueue {
     }
 
     pub fn push(&mut self, job: AggregationUpdateJob) {
-        println!("push {:?}", job);
         self.jobs.push_back(job);
     }
 
@@ -277,7 +267,6 @@ impl AggregationUpdateQueue {
     pub fn process(&mut self, ctx: &ExecuteContext<'_>) -> bool {
         self.stats.processed_jobs += 1;
         if let Some(job) = self.jobs.pop_front() {
-            println!("process {:?}", job);
             match job {
                 AggregationUpdateJob::UpdateAggregationNumber {
                     task_id,
@@ -296,15 +285,6 @@ impl AggregationUpdateQueue {
                     let aggregation_number = base_aggregation_number.saturating_add(distance);
                     if old >= aggregation_number {
                         if base_aggregation_number != current.base && distance != current.distance {
-                            println!(
-                                "UpdateAggregationNumber meta {:?} base {} -> {}, distance {} -> \
-                                 {}",
-                                task_id,
-                                current.base,
-                                base_aggregation_number,
-                                current.distance,
-                                distance
-                            );
                             task.insert(CachedDataItem::AggregationNumber {
                                 value: AggregationNumber {
                                     base: base_aggregation_number,
@@ -314,17 +294,6 @@ impl AggregationUpdateQueue {
                             });
                         }
                     } else {
-                        println!(
-                            "UpdateAggregationNumber {:?} {} -> {}, base {} -> {}, distance {} -> \
-                             {}",
-                            task_id,
-                            old,
-                            aggregation_number,
-                            current.base,
-                            base_aggregation_number,
-                            current.distance,
-                            distance
-                        );
                         task.insert(CachedDataItem::AggregationNumber {
                             value: AggregationNumber {
                                 base: base_aggregation_number,
@@ -604,7 +573,6 @@ impl AggregationUpdateQueue {
                         if task.has_key(&CachedDataItemKey::Dirty {}) {
                             let description = ctx.backend.get_task_desc_fn(task_id);
                             if task.add(CachedDataItem::new_scheduled(description)) {
-                                println!("Scheduled {:?}", task_id);
                                 ctx.turbo_tasks.schedule(task_id);
                             }
                         }
@@ -629,11 +597,6 @@ impl AggregationUpdateQueue {
                         ctx.task_pair(upper_id, task_id, TaskDataCategory::Meta);
                     let upper_aggregation_number = get_aggregation_number(&upper);
                     let task_aggregation_number = get_aggregation_number(&task);
-                    println!(
-                        "BalanceEdge {:?} {upper_aggregation_number} {:?} \
-                         {task_aggregation_number}",
-                        upper_id, task_id
-                    );
 
                     let should_be_inner = is_root_node(upper_aggregation_number)
                         || upper_aggregation_number > task_aggregation_number;
@@ -732,12 +695,7 @@ impl AggregationUpdateQueue {
             }
         }
 
-        if self.jobs.is_empty() {
-            println!("done");
-            true
-        } else {
-            false
-        }
+        self.jobs.is_empty()
     }
 }
 
