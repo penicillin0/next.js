@@ -2470,10 +2470,6 @@ export default abstract class Server<
           const context: AppRouteRouteHandlerContext = {
             params: opts.params,
             prerenderManifest,
-            context: {
-              waitUntil: req.context?.waitUntil,
-              onClose: res.onClose.bind(res),
-            },
             renderOpts: {
               experimental: {
                 after: renderOpts.experimental.after,
@@ -2488,10 +2484,10 @@ export default abstract class Server<
           }
 
           try {
-            const request = NextRequestAdapter.fromNodeNextRequest(
-              req,
-              signalFromNodeResponse(res.originalResponse)
-            )
+            const request = NextRequestAdapter.fromNodeNextRequest(req, {
+              signal: signalFromNodeResponse(res.originalResponse),
+              onClose: res.onClose.bind(res),
+            })
 
             const response = await routeModule.handle(request, context)
 
