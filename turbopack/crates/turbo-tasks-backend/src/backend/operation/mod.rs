@@ -66,7 +66,14 @@ impl<'a> ExecuteContext<'a> {
                     // Avoid holding the lock too long since this can also affect other tasks
                     drop(task);
 
-                    let items = self.backend.backing_storage.lookup_data(task_id, category);
+                    let items = {
+                        let _span = tracing::trace_span!(
+                            "restore task",
+                            task = self.backend.get_task_desc_fn(task_id)()
+                        )
+                        .entered();
+                        self.backend.backing_storage.lookup_data(task_id, category)
+                    };
                     task = self.backend.storage.access_mut(task_id);
                     if !task.persistance_state().is_restored(category) {
                         if items.len() > 10000 {
@@ -117,10 +124,22 @@ impl<'a> ExecuteContext<'a> {
                 drop(task1);
                 drop(task2);
 
-                let items1 = (!is_restored1)
-                    .then(|| self.backend.backing_storage.lookup_data(task_id1, category));
-                let items2 = (!is_restored2)
-                    .then(|| self.backend.backing_storage.lookup_data(task_id2, category));
+                let items1 = (!is_restored1).then(|| {
+                    let _span = tracing::trace_span!(
+                        "restore task",
+                        task = self.backend.get_task_desc_fn(task_id1)()
+                    )
+                    .entered();
+                    self.backend.backing_storage.lookup_data(task_id1, category)
+                });
+                let items2 = (!is_restored2).then(|| {
+                    let _span = tracing::trace_span!(
+                        "restore task",
+                        task = self.backend.get_task_desc_fn(task_id2)()
+                    )
+                    .entered();
+                    self.backend.backing_storage.lookup_data(task_id2, category)
+                });
 
                 let (t1, t2) = self.backend.storage.access_pair_mut(task_id1, task_id2);
                 task1 = t1;
