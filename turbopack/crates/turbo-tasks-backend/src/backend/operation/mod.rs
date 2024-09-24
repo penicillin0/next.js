@@ -69,6 +69,7 @@ impl<'a> ExecuteContext<'a> {
                     let items = {
                         let _span = tracing::trace_span!(
                             "restore task",
+                            category = ?category,
                             task = self.backend.get_task_desc_fn(task_id)()
                         )
                         .entered();
@@ -127,6 +128,7 @@ impl<'a> ExecuteContext<'a> {
                 let items1 = (!is_restored1).then(|| {
                     let _span = tracing::trace_span!(
                         "restore task",
+                        category = ?category,
                         task = self.backend.get_task_desc_fn(task_id1)()
                     )
                     .entered();
@@ -135,6 +137,7 @@ impl<'a> ExecuteContext<'a> {
                 let items2 = (!is_restored2).then(|| {
                     let _span = tracing::trace_span!(
                         "restore task",
+                        category = ?category,
                         task = self.backend.get_task_desc_fn(task_id2)()
                     )
                     .entered();
