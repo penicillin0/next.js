@@ -102,6 +102,7 @@ import {
   type AppSegmentConfig,
 } from './app-segment-config'
 import { DEFAULT_SEGMENT_KEY, PAGE_SEGMENT_KEY } from '../shared/lib/segment'
+import { normalizeZodErrors } from '../shared/lib/zod'
 import type { AppDirModules } from './webpack/loaders/next-app-loader'
 
 export type ROUTER_TYPE = 'pages' | 'app'
@@ -1327,6 +1328,14 @@ export async function collectGenerateParams(tree: LoaderTree) {
             `${getModuleName(type)} "${segmentAppFilePath}" must export "generateStaticParams" because it exports "dynamicParams: false"`
           )
         }
+      } else {
+        const messages = [
+          `Invalid segment configuration options detected for ${getModuleName(type)} "${segmentAppFilePath}": `,
+        ]
+        for (const { message } of normalizeZodErrors(config.error)) {
+          messages.push(`    ${message}`)
+        }
+        throw new Error(messages.join('\n'))
       }
     }
 
