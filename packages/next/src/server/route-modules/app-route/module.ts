@@ -1,6 +1,6 @@
 import type { NextConfig } from '../../config-shared'
 import type { AppRouteRouteDefinition } from '../../route-definitions/app-route-route-definition'
-import type { AppConfig } from '../../../build/utils'
+import type { AppSegmentConfig } from '../../../build/app-segment-config'
 import type { NextRequest } from '../../web/spec-extension/request'
 import type { PrerenderManifest } from '../../../build'
 import type { NextURL } from '../../web/next-url'
@@ -122,7 +122,10 @@ export type AppRouteHandlers = {
  * routes. This contains all the user generated code.
  */
 export type AppRouteUserlandModule = AppRouteHandlers &
-  Pick<AppConfig, 'dynamic' | 'revalidate' | 'dynamicParams' | 'fetchCache'> & {
+  Pick<
+    AppSegmentConfig,
+    'dynamic' | 'revalidate' | 'dynamicParams' | 'fetchCache'
+  > & {
     // TODO: (wyattjoh) create a type for this
     generateStaticParams?: any
   }

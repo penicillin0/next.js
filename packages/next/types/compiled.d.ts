@@ -54,6 +54,12 @@ declare module 'next/dist/compiled/jest-worker' {
   }
 }
 
+declare module 'next/dist/compiled/zod' {
+  // eslint-disable-next-line import/no-extraneous-dependencies
+  import * as m from 'zod'
+  export = m
+}
+
 declare module 'next/dist/compiled/amphtml-validator' {
   export type ValidationError = any
 }

@@ -10,7 +10,7 @@ import {
   reduceAppConfig,
 } from '../../build/utils'
 import type {
-  GenerateParamsResults,
+  GenerateParamsResult,
   PartialStaticPathsResult,
 } from '../../build/utils'
 import { loadComponents } from '../load-components'
@@ -93,7 +93,7 @@ export async function loadStaticPaths({
 
   if (isAppPath) {
     const { routeModule } = components
-    const generateParams: GenerateParamsResults =
+    const generateParams: GenerateParamsResult[] =
       routeModule && isAppRouteRouteModule(routeModule)
         ? [
             {
