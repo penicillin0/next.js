@@ -2,37 +2,7 @@
 
 Count: 19
 
-## Item 1: Stmt 1, `ImportOfModule`
-
-```js
-import { upper } from "module";
-
-```
-
-- Hoisted
-- Side effects
-
-## Item 2: Stmt 1, `ImportBinding(0)`
-
-```js
-import { upper } from "module";
-
-```
-
-- Hoisted
-- Declares: `upper`
-
-## Item 3: Stmt 12, `ImportOfModule`
-
-```js
-import "other";
-
-```
-
-- Hoisted
-- Side effects
-
-## Item 4: Stmt 0, `Normal`
+## Item 1: Stmt 0, `Normal`
 
 ```js
 export function external1() {
@@ -46,7 +16,27 @@ export function external1() {
 - Reads (eventual): `internal`, `foobar`
 - Write: `external1`
 
-## Item 5: Stmt 2, `VarDeclarator(0)`
+## Item 2: Stmt 1, `ImportOfModule`
+
+```js
+import { upper } from "module";
+
+```
+
+- Hoisted
+- Side effects
+
+## Item 3: Stmt 1, `ImportBinding(0)`
+
+```js
+import { upper } from "module";
+
+```
+
+- Hoisted
+- Declares: `upper`
+
+## Item 4: Stmt 2, `VarDeclarator(0)`
 
 ```js
 export let foobar = "foo";
@@ -56,7 +46,7 @@ export let foobar = "foo";
 - Declares: `foobar`
 - Write: `foobar`
 
-## Item 6: Stmt 3, `VarDeclarator(0)`
+## Item 5: Stmt 3, `VarDeclarator(0)`
 
 ```js
 export const foo = foobar;
@@ -67,7 +57,7 @@ export const foo = foobar;
 - Reads: `foobar`
 - Write: `foo`
 
-## Item 7: Stmt 4, `VarDeclarator(0)`
+## Item 6: Stmt 4, `VarDeclarator(0)`
 
 ```js
 const bar = "bar";
@@ -77,7 +67,7 @@ const bar = "bar";
 - Declares: `bar`
 - Write: `bar`
 
-## Item 8: Stmt 5, `Normal`
+## Item 7: Stmt 5, `Normal`
 
 ```js
 foobar += bar;
@@ -87,7 +77,7 @@ foobar += bar;
 - Reads: `bar`, `foobar`
 - Write: `foobar`
 
-## Item 9: Stmt 6, `VarDeclarator(0)`
+## Item 8: Stmt 6, `VarDeclarator(0)`
 
 ```js
 let foobarCopy = foobar;
@@ -98,7 +88,7 @@ let foobarCopy = foobar;
 - Reads: `foobar`
 - Write: `foobarCopy`
 
-## Item 10: Stmt 7, `Normal`
+## Item 9: Stmt 7, `Normal`
 
 ```js
 foobar += "foo";
@@ -108,7 +98,7 @@ foobar += "foo";
 - Reads: `foobar`
 - Write: `foobar`
 
-## Item 11: Stmt 8, `Normal`
+## Item 10: Stmt 8, `Normal`
 
 ```js
 console.log(foobarCopy);
@@ -118,7 +108,7 @@ console.log(foobarCopy);
 - Side effects
 - Reads: `foobarCopy`
 
-## Item 12: Stmt 9, `Normal`
+## Item 11: Stmt 9, `Normal`
 
 ```js
 foobarCopy += "Unused";
@@ -128,7 +118,7 @@ foobarCopy += "Unused";
 - Reads: `foobarCopy`
 - Write: `foobarCopy`
 
-## Item 13: Stmt 10, `Normal`
+## Item 12: Stmt 10, `Normal`
 
 ```js
 function internal() {
@@ -142,7 +132,7 @@ function internal() {
 - Reads (eventual): `upper`, `foobar`
 - Write: `internal`
 
-## Item 14: Stmt 11, `Normal`
+## Item 13: Stmt 11, `Normal`
 
 ```js
 export function external2() {
@@ -156,12 +146,21 @@ export function external2() {
 - Write: `external2`
 - Write (eventual): `foobar`
 
+## Item 14: Stmt 12, `ImportOfModule`
+
+```js
+import "other";
+
+```
+
+- Hoisted
+- Side effects
+
 # Phase 1
 ```mermaid
 graph TD
-    Item1;
     Item3;
-    Item2;
+    Item1;
     Item4;
     Item5;
     Item6;
@@ -173,6 +172,7 @@ graph TD
     Item12;
     Item13;
     Item14;
+    Item2;
     Item15;
     Item15["ModuleEvaluation"];
     Item16;
@@ -188,9 +188,8 @@ graph TD
 # Phase 2
 ```mermaid
 graph TD
-    Item1;
     Item3;
-    Item2;
+    Item1;
     Item4;
     Item5;
     Item6;
@@ -202,6 +201,7 @@ graph TD
     Item12;
     Item13;
     Item14;
+    Item2;
     Item15;
     Item15["ModuleEvaluation"];
     Item16;
@@ -229,10 +229,10 @@ graph TD
     Item11 -.-> Item13;
     Item11 -.-> Item10;
     Item11 -.-> Item6;
-    Item11 -.-> Item3;
+    Item11 -.-> Item4;
     Item12 --> Item9;
     Item12 -.-> Item11;
-    Item16 --> Item4;
+    Item16 --> Item3;
     Item17 --> Item10;
     Item17 --> Item5;
     Item18 --> Item6;
@@ -241,9 +241,8 @@ graph TD
 # Phase 3
 ```mermaid
 graph TD
-    Item1;
     Item3;
-    Item2;
+    Item1;
     Item4;
     Item5;
     Item6;
@@ -255,6 +254,7 @@ graph TD
     Item12;
     Item13;
     Item14;
+    Item2;
     Item15;
     Item15["ModuleEvaluation"];
     Item16;
@@ -282,18 +282,18 @@ graph TD
     Item11 -.-> Item13;
     Item11 -.-> Item10;
     Item11 -.-> Item6;
-    Item11 -.-> Item3;
+    Item11 -.-> Item4;
     Item12 --> Item9;
     Item12 -.-> Item11;
-    Item16 --> Item4;
+    Item16 --> Item3;
     Item17 --> Item10;
     Item17 --> Item5;
     Item18 --> Item6;
     Item19 --> Item14;
-    Item4 --> Item13;
-    Item4 --> Item10;
-    Item4 --> Item5;
-    Item13 --> Item3;
+    Item3 --> Item13;
+    Item3 --> Item10;
+    Item3 --> Item5;
+    Item13 --> Item4;
     Item13 --> Item10;
     Item13 --> Item5;
     Item14 -.-> Item6;
@@ -304,9 +304,8 @@ graph TD
 # Phase 4
 ```mermaid
 graph TD
-    Item1;
     Item3;
-    Item2;
+    Item1;
     Item4;
     Item5;
     Item6;
@@ -318,6 +317,7 @@ graph TD
     Item12;
     Item13;
     Item14;
+    Item2;
     Item15;
     Item15["ModuleEvaluation"];
     Item16;
@@ -345,18 +345,18 @@ graph TD
     Item11 -.-> Item13;
     Item11 -.-> Item10;
     Item11 -.-> Item6;
-    Item11 -.-> Item3;
+    Item11 -.-> Item4;
     Item12 --> Item9;
     Item12 -.-> Item11;
-    Item16 --> Item4;
+    Item16 --> Item3;
     Item17 --> Item10;
     Item17 --> Item5;
     Item18 --> Item6;
     Item19 --> Item14;
-    Item4 --> Item13;
-    Item4 --> Item10;
-    Item4 --> Item5;
-    Item13 --> Item3;
+    Item3 --> Item13;
+    Item3 --> Item10;
+    Item3 --> Item5;
+    Item13 --> Item4;
     Item13 --> Item10;
     Item13 --> Item5;
     Item14 -.-> Item6;
