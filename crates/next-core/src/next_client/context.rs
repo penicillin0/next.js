@@ -48,7 +48,7 @@ use crate::{
             NextSharedRuntimeResolvePlugin,
         },
         transforms::{
-            emotion::get_emotion_transform_rule,
+            emotion::get_emotion_transform_rule, get_simplifier_rule,
             react_remove_properties::get_react_remove_properties_transform_rule,
             relay::get_relay_transform_rule, remove_console::get_remove_console_transform_rule,
             styled_components::get_styled_components_transform_rule,

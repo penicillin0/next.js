@@ -60,6 +60,7 @@ pub enum EcmascriptInputTransform {
         #[serde(default)]
         use_define_for_class_fields: bool,
     },
+    Simplifier,
 }
 
 /// The CustomTransformer trait allows you to implement your own custom SWC
@@ -303,6 +304,13 @@ impl EcmascriptInputTransform {
             }
             EcmascriptInputTransform::Plugin(transform) => {
                 transform.await?.transform(program, ctx).await?
+            }
+            EcmascriptInputTransform::Simplifier => {
+                let p = std::mem::replace(program, Program::Module(Module::dummy()));
+                *program = p.fold_with(&mut swc_core::ecma::transforms::optimization::simplifier(
+                    unresolved_mark,
+                    Default::default(),
+                ));
             }
         }
         Ok(())
